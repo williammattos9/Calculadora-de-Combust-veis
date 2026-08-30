@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Combustível</title>
+    <style>
+        :root {
+            --cinza-fundo: #2b3036;       /* Cinza Bandeirante escuro */
+            --cinza-card: #3a4048;        /* Cinza intermediário */
+            --cinza-input: #1f2327;       /* Cinza escuro para campos */
+            --texto-principal: #ffffff;
+            --texto-secundario: #b8c1cc;
+            --destaque-vermelho: #e63946;  /* Vermelho vibrante */
+            --borda-foco: #ff4d5a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--cinza-fundo);
+            color: var(--texto-principal);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--cinza-card);
+            border-radius: 12px;
+            padding: 30px 25px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        h1 {
+            font-size: 1.35rem;
+            text-align: center;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        p.subtitulo {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--texto-secundario);
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            background-color: var(--cinza-input);
+            border: 1px solid #4a525d;
+            border-radius: 6px;
+            color: var(--texto-principal);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--borda-foco);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--destaque-vermelho);
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: filter 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            filter: brightness(1.1);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        #resultado-container {
+            display: none;
+            margin-top: 24px;
+            padding: 16px;
+            background-color: var(--cinza-input);
+            border-radius: 8px;
+            border-left: 4px solid var(--destaque-vermelho);
+            text-align: center;
+        }
+
+        .resultado-destaque {
+            color: var(--destaque-vermelho);
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .resultado-detalhe {
+            color: var(--texto-secundario);
+            font-size: 0.85rem;
+        }
+
+        footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--texto-secundario);
+        }
+
+        footer strong {
+            color: var(--texto-principal);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>CALCULADORA DE COMBUSTÍVEIS</h1>
+        <p class="subtitulo">Desenvolvido para o melhor custo - benefício. Deixa que calculamos para você 😊</p>
+
+        <form id="calc-form">
+            <div class="form-group">
+                <label for="preco-alcool">Preço do Litro do Álcool (R$)</label>
+                <input type="number" id="preco-alcool" step="0.01" min="0.01" placeholder="Ex: 3.49" required>
+            </div>
+
+            <div class="form-group">
+                <label for="preco-gasolina">Preço do Litro da Gasolina (R$)</label>
+                <input type="number" id="preco-gasolina" step="0.01" min="0.01" placeholder="Ex: 5.89" required>
+            </div>
+
+            <button type="submit">Calcular Vantagem</button>
+        </form>
+
+        <div id="resultado-container">
+            <div class="resultado-destaque" id="resultado-texto"></div>
+            <div class="resultado-detalhe" id="resultado-proporcao"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Siga <strong>@imprimax_3d</strong> no Instagram</p>
+    </footer>
+
+    <script>
+        document.getElementById('calc-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const alcool = parseFloat(document.getElementById('preco-alcool').value);
+            const gasolina = parseFloat(document.getElementById('preco-gasolina').value);
+            const resultadoContainer = document.getElementById('resultado-container');
+            const resultadoTexto = document.getElementById('resultado-texto');
+            const resultadoProporcao = document.getElementById('resultado-proporcao');
+
+            if (isNaN(alcool) || isNaN(gasolina) || gasolina <= 0) {
+                return;
+            }
+
+            const razao = (alcool / gasolina);
+            const porcentagem = (razao * 100).toFixed(1);
+
+            resultadoContainer.style.display = 'block';
+
+            if (razao <= 0.70) {
+                resultadoTexto.textContent = "Abasteça com ÁLCOOL";
+                resultadoProporcao.textContent = `O preço do álcool equivale a ${porcentagem}% da gasolina (abaixo de 70%).`;
+            } else {
+                resultadoTexto.textContent = "Abasteça com GASOLINA";
+                resultadoProporcao.textContent = `O preço do álcool equivale a ${porcentagem}% da gasolina (acima de 70%).`;
+            }
+        });
+    </script>
+</body>
+</html>
